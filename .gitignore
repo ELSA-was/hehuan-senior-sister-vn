@@ -1,0 +1,5 @@
+# 开发/校验脚本与临时产物，不进入部署仓库
+*.py
+check*.jpg
+test_composite*.jpg
+_load.js

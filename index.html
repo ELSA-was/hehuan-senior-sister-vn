@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重生成合欢宗大师姐以后，我成了万人迷？！</title>
+<style>
+  :root{
+    --ink:#3d2b3a; --rose:#c94f6d; --rose-deep:#9c2f4e; --gold:#d4a556;
+    --paper:rgba(28,16,26,.82); --paper-2:rgba(46,26,42,.92);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
+  html,body{height:100%;overflow:hidden;background:#120a10;
+    font-family:"Noto Serif SC","Source Han Serif SC","STZhongsong","STKaiti","KaiTi",serif;}
+  #app{position:relative;width:100vw;height:100vh;overflow:hidden}
+  /* ---------- 背景与立绘 ---------- */
+  #bg{position:absolute;inset:0;background-size:cover;background-position:center;
+    transition:opacity .6s ease; z-index:0}
+  #bgDim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,4,10,.25),rgba(10,4,10,0) 30%,rgba(10,4,10,.15) 75%,rgba(18,8,16,.55));z-index:1;transition:opacity .4s}
+  #sprWrap{position:absolute;inset:0;z-index:2;pointer-events:none;display:flex;justify-content:center;align-items:flex-end}
+  #spr{height:92%;max-width:70vw;object-fit:contain;object-position:bottom;
+    filter:drop-shadow(0 12px 30px rgba(0,0,0,.55));
+    transition:opacity .35s ease, transform .35s ease;}
+  #spr.enter{animation:sprIn .45s ease}
+  @keyframes sprIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  /* ---------- 顶部栏 ---------- */
+  #topbar{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;gap:10px;
+    align-items:center;padding:10px 16px;
+    background:linear-gradient(180deg,rgba(18,8,16,.75),rgba(18,8,16,0));transition:opacity .35s}
+  #topbar.hidden-ui{opacity:0;pointer-events:none}
+  .tbtn{cursor:pointer;border:1px solid rgba(212,165,86,.55);color:#f3e6c8;border-radius:20px;
+    padding:5px 14px;font-size:14px;background:rgba(30,14,26,.55);letter-spacing:2px;transition:.2s}
+  .tbtn:hover{background:rgba(201,79,109,.45);border-color:var(--rose)}
+  #affBar{margin-left:auto;display:flex;gap:8px;font-size:12.5px;color:#f7dfc4;flex-wrap:wrap;justify-content:flex-end}
+  .affchip{background:rgba(30,14,26,.6);border:1px solid rgba(212,165,86,.35);border-radius:14px;padding:3px 9px;white-space:nowrap}
+  /* ---------- 对话框 ---------- */
+  #dlg{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:min(920px,94vw);z-index:15;
+    transition:opacity .35s, transform .35s;cursor:pointer}
+  #dlg.hidden-ui{opacity:0;transform:translateX(-50%) translateY(30px);pointer-events:none}
+  #dlgBox{background:var(--paper);border:1px solid rgba(212,165,86,.4);border-radius:18px;
+    padding:20px 26px 22px 116px;min-height:128px;position:relative;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(6px)}
+  #avatar{position:absolute;left:-8px;top:-34px;width:96px;height:96px;border-radius:50%;
+    border:3px solid var(--gold);object-fit:cover;background:#20101c;
+    box-shadow:0 6px 18px rgba(0,0,0,.6)}
+  #who{color:#f5d9a8;font-size:19px;letter-spacing:3px;margin-bottom:6px;text-shadow:0 1px 3px #000}
+  #txt{color:#f5ecdf;font-size:17.5px;line-height:1.85;letter-spacing:.6px;min-height:64px}
+  #txt .narr{color:#d8c9e0}
+  #txt em{color:#f2b8c6;font-style:normal}
+  #hint{position:absolute;right:18px;bottom:8px;color:#c9a86a;font-size:12px;opacity:.8;animation:blink 1.6s infinite}
+  @keyframes blink{50%{opacity:.2}}
+  #hideHint{position:absolute;right:16px;bottom:6px;z-index:9;color:rgba(245,230,200,.45);font-size:12px;letter-spacing:1px;pointer-events:none;transition:opacity .35s}
+  body.ui-hidden #hideHint{opacity:0}
+  /* ---------- 选项 ---------- */
+  #choices{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;gap:14px;
+    justify-content:center;align-items:center;padding:0 12vw}
+  .choice{cursor:pointer;width:100%;max-width:640px;text-align:center;color:#f7ecd9;
+    background:linear-gradient(90deg,rgba(46,22,40,.88),rgba(70,32,56,.88));
+    border:1px solid rgba(212,165,86,.5);border-radius:14px;padding:14px 22px;font-size:17px;
+    letter-spacing:1px;transition:.18s;box-shadow:0 6px 22px rgba(0,0,0,.45)}
+  .choice:hover{transform:scale(1.03);border-color:var(--rose);background:linear-gradient(90deg,rgba(90,32,58,.92),rgba(120,44,74,.92))}
+  .choice .sub{display:block;font-size:12.5px;color:#d9b98c;margin-top:3px;letter-spacing:.5px}
+  /* ---------- 标题屏 ---------- */
+  #title{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    background:linear-gradient(180deg,rgba(20,8,18,.35),rgba(20,8,18,.72)),url('assets/bg_hehuan.png') center/cover;}
+  #title h1{color:#ffe9b8;font-size:min(6.2vw,52px);letter-spacing:6px;text-align:center;
+    text-shadow:0 0 24px rgba(201,79,109,.8),0 4px 12px rgba(0,0,0,.8);margin-bottom:8px}
+  #title h2{color:#f0b9c8;font-size:min(3vw,20px);letter-spacing:10px;margin-bottom:46px;font-weight:normal}
+  .menuBtn{cursor:pointer;color:#ffe9c9;border:1px solid rgba(212,165,86,.65);background:rgba(30,14,26,.72);
+    border-radius:30px;padding:13px 54px;font-size:19px;letter-spacing:8px;margin:9px 0;transition:.2s;width:300px;text-align:center}
+  .menuBtn:hover{background:var(--rose-deep);box-shadow:0 0 24px rgba(201,79,109,.6)}
+  .menuBtn:disabled{opacity:.35;cursor:not-allowed}
+  #titleFoot{position:absolute;bottom:16px;color:rgba(255,230,190,.5);font-size:12.5px;letter-spacing:2px;text-align:center;width:100%}
+  /* ---------- 弹层 ---------- */
+  .modal{position:absolute;inset:0;z-index:60;background:rgba(8,3,8,.78);display:flex;justify-content:center;align-items:center;padding:20px}
+  .modal .card{background:linear-gradient(160deg,#2a1424,#3b1b30);border:1px solid rgba(212,165,86,.55);
+    border-radius:18px;max-width:640px;width:100%;max-height:82vh;overflow-y:auto;padding:28px 32px;color:#f2e6d5;
+    box-shadow:0 14px 60px rgba(0,0,0,.7)}
+  .card h3{color:#f5d9a8;letter-spacing:4px;font-size:21px;margin-bottom:14px;text-align:center}
+  .card p{line-height:1.9;font-size:15.5px;margin-bottom:12px}
+  .card .btnRow{display:flex;gap:14px;justify-content:center;margin-top:18px}
+  .card .tbtn{font-size:15px;padding:9px 26px}
+  .card::-webkit-scrollbar{width:6px}.card::-webkit-scrollbar-thumb{background:#5a3a52;border-radius:3px}
+  /* 结局图鉴 */
+  #endGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  .endCell{border:1px solid rgba(212,165,86,.4);border-radius:10px;padding:10px 8px;text-align:center;font-size:13.5px;cursor:pointer;transition:.2s;background:rgba(20,10,18,.5)}
+  .endCell.on{color:#ffd9a0;border-color:var(--rose);background:rgba(120,40,66,.35)}
+  .endCell.off{color:#6b5566;cursor:default}
+  .endCell .tag{display:block;font-size:11px;letter-spacing:2px;margin-bottom:3px;color:#c98aa2}
+  .endCell.on .tag{color:#f2b8c6}
+  /* 结局卡 */
+  #endCard{position:absolute;inset:0;z-index:55;display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgba(8,3,8,.9);gap:18px}
+  #endCard .big{font-size:min(7vw,46px);letter-spacing:10px;color:#ffe1a8;text-shadow:0 0 30px rgba(201,79,109,.9)}
+  #endCard .small{color:#e8c9d4;letter-spacing:4px;font-size:16px}
+  #endCard .tbtn{font-size:16px;padding:10px 34px;margin-top:10px}
+  #endCard .replay{color:#d9b3c1;font-size:13px;letter-spacing:2px}
+  .rose-line{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:4px auto 14px}
+  #flash{position:absolute;inset:0;background:#fff;z-index:70;opacity:0;pointer-events:none;transition:opacity .5s}
+  @media (max-width:700px){
+    #dlgBox{padding-left:20px;padding-top:52px}
+    #avatar{width:64px;height:64px;top:-26px;left:12px}
+    #txt{font-size:15.5px} .choice{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bg"></div>
+  <div id="bgDim"></div>
+  <div id="sprWrap"><img id="spr" alt="" draggable="false"></div>
+  <div id="topbar">
+    <div class="tbtn" onclick="game.save(true)">存档</div>
+    <div class="tbtn" onclick="game.toTitle()">标题</div>
+    <div class="tbtn" onclick="game.toggleAff()">好感</div>
+    <div class="tbtn" id="bgmBtn" onclick="game.toggleBgm()">♪ 音乐</div>
+    <div id="affBar"></div>
+  </div>
+  <div id="hideHint">点击画面可隐藏文字界面，欣赏立绘 · 再次点击复原</div>
+  <audio id="bgmAudio" loop preload="auto" style="display:none"></audio>
+  <div id="dlg" onclick="game.advance()">
+    <img id="avatar" alt="" draggable="false">
+    <div id="dlgBox">
+      <div id="who"></div>
+      <div id="txt"></div>
+      <div id="hint">▼ 点击继续</div>
+    </div>
+  </div>
+  <div id="choices" style="display:none"></div>
+  <div id="flash"></div>
+  <div id="overlay"></div>
+</div>
+<script src="story1.js"></script>
+<script src="story2.js"></script>
+<script>
+/* 本地存档兜底：Safari 等浏览器在 file:// 下会禁用 localStorage，
+   访问即抛 SecurityError，若不管会连累整段脚本无法初始化 -> 退回内存存储 */
+const LS = (()=>{ try{ const L = window.localStorage; L.setItem('__t','1'); L.removeItem('__t'); return L; }
+  catch(e){ const m={}; return {getItem:k=>(k in m?m[k]:null),setItem:(k,v)=>{m[k]=String(v);},removeItem:k=>{delete m[k];}}; } })();
+const CHARS = {
+  heroine:  {name:'聂霜月', img:'assets/heroine.png'},
+  shiyue:   {name:'蚀樾',   img:'assets/shiye.png'},
+  songlian: {name:'宋敛',   img:'assets/songlian.png'},
+  wenxu:    {name:'问栩',   img:'assets/wenxu.png'},
+  xiayi:    {name:'夏懿',   img:'assets/xiayi.png'},
+  luojinglan:{name:'洛惊澜',img:'assets/luojinglan.png'},
+  yunheng:  {name:'云蘅夫人', img:null},
+  crowd:    {name:'众人',    img:null},
+  none:     {name:'', img:null},
+};
+const AFF_KEYS = ['shiyue','songlian','wenxu','xiayi','luojinglan'];
+const ENDINGS = [
+  {id:'te_shiyue', tag:'长篇·True End', name:'《魔后归位》'},
+  {id:'te_songlian',tag:'长篇·True End', name:'《情丝入骨》'},
+  {id:'te_wenxu',  tag:'长篇·True End', name:'《卜得一心》'},
+  {id:'te_xiayi',  tag:'长篇·True End', name:'《符证前缘》'},
+  {id:'te_luo',    tag:'长篇·True End', name:'《剑心映月》'},
+  {id:'be_chongdao',tag:'短篇·Bad End', name:'《重蹈覆辙》'},
+  {id:'be_luding', tag:'短篇·Bad End',  name:'《炉鼎》'},
+  {id:'ne_dudao',  tag:'短篇·Normal End',name:'《大道独行》'},
+  {id:'se_mizong', tag:'短篇·Secret End',name:'《秘境迷踪》'},
+  {id:'be_fanshi', tag:'短篇·Bad End',  name:'《情蛊反噬》'},
+  {id:'ne_jianghu',tag:'短篇·Normal End',name:'《江湖不见》'},
+  {id:'ne_tianji', tag:'短篇·Normal End',name:'《天机白头》'},
+  {id:'ne_fuduan', tag:'短篇·Normal End',name:'《符断缘消》'},
+  {id:'se_xiuluo', tag:'短篇·Special End',name:'《修罗场未定》'},
+];
+
+const game = {
+  aff:{}, flags:{}, node:null, typing:false, typeTimer:null, fullText:'', affVisible:false,
+  unlocked: JSON.parse(LS.getItem('hhz_ends')||'{}'),
+
+  init(){
+    this.overlay = document.getElementById('overlay');
+    this.showTitle();
+  },
+  resetState(){
+    this.aff = {shiyue:0,songlian:0,wenxu:0,xiayi:0,luojinglan:0};
+    this.flags = {};
+  },
+  /* ---------- 程序化古风 BGM ---------- */
+  toggleBgm(){
+    if(this._bgmOn){ this.stopBgm(); return; }
+    this.startBgm();
+  },
+  startBgm(){
+    try{
+      const AC = window.AudioContext||window.webkitAudioContext;
+      if(!AC){ this.toast('当前环境不支持音乐'); return; }
+      const ctx = this._actx || (this._actx = new AC());
+      if(ctx.state==='suspended') ctx.resume();
+      const master = ctx.createGain(); master.gain.value=0.0; master.connect(ctx.destination);
+      const lfo = ctx.createOscillator(); const lfoGain=ctx.createGain();
+      lfo.frequency.value=0.06; lfoGain.gain.value=0.018; lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start();
+      master.gain.linearRampToValueAtTime(0.16, ctx.currentTime+2.5);
+      // 五声音阶 (宫商角徵羽) 频率
+      const scale=[261.63,293.66,329.63,392.00,440.00,523.25];
+      const pick=()=>scale[Math.floor(Math.random()*scale.length)];
+      const playNote=()=>{
+        if(!this._bgmOn) return;
+        const o=ctx.createOscillator(); const g=ctx.createGain();
+        o.type='sine'; const f=pick(); o.frequency.value=f;
+        const o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=f*2.001;
+        const g2=ctx.createGain(); g2.gain.value=0.25;
+        const t=ctx.currentTime; const dur=2.4+Math.random()*1.6;
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.5,t+0.4); g.gain.linearRampToValueAtTime(0.0001,t+dur);
+        o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+        o.start(t); o2.start(t); o.stop(t+dur); o2.stop(t+dur);
+        this._bgmTimer=setTimeout(playNote, 1600+Math.random()*1600);
+      };
+      this._bgmMaster=master; this._bgmOn=true; this._bgmLfo=lfo;
+      document.getElementById('bgmBtn').textContent='♪ 静音';
+      playNote();
+    }catch(e){ console.error(e); this.toast('音乐启动失败'); }
+  },
+  stopBgm(){
+    this._bgmOn=false;
+    clearTimeout(this._bgmTimer);
+    if(this._bgmMaster){ const t=this._actx.currentTime; try{this._bgmMaster.gain.cancelScheduledValues(t); this._bgmMaster.gain.linearRampToValueAtTime(0,t+0.6);}catch(e){} }
+    document.getElementById('bgmBtn').textContent='♪ 音乐';
+  },
+  showTitle(){
+    this.node=null;
+    document.getElementById('dlg').style.display='none';
+    document.getElementById('topbar').style.display='none';
+    document.getElementById('choices').style.display='none';
+    document.getElementById('spr').style.display='none';
+    const hasSave = !!LS.getItem('hhz_save');
+    this.overlay.innerHTML = `
+    <div id="title">
+      <h1>重生成合欢宗大师姐以后<br>我成了万人迷？！</h1>
+      <h2>修 仙 · 重 生 · 万 人 迷</h2>
+      <div class="menuBtn" onclick="game.confirm18()">入 坑 开 玩</div>
+      <div class="menuBtn" ${hasSave?'':'disabled'} onclick="game.load()">继 续 上 世</div>
+      <div class="menuBtn" onclick="game.showEnds()">结 局 图 鉴（${Object.keys(this.unlocked).length}/14）</div>
+      <div id="titleFoot">女性向 BG 文字游戏 · R18 章节为唯美含蓄风格 · 需年满十八岁<br>五条攻略线 · 十四个结局 · 点击画面可隐藏UI欣赏立绘</div>
+    </div>`;
+  },
+  toTitle(){ this.stopBgm(); this.showTitle(); },
+  confirm18(){
+    this.overlay.innerHTML = `
+    <div class="modal"><div class="card">
+      <h3>⚠ 年龄确认</h3><div class="rose-line"></div>
+      <p>本作含有<b>成人向恋爱情节</b>（以合欢宗双修为背景的亲密章节，均采用含蓄唯美的文学化描写）。</p>
+      <p>继续游玩即表示你确认已<b>年满 18 周岁</b>。未满十八岁可选择跳过相关章节，不影响剧情完整。</p>
+      <div class="btnRow">
+        <div class="tbtn" onclick="game.startNew()">我已成年，开始</div>
+        <div class="tbtn" onclick="game.startNew(true)">未成年，跳过R18</div>
+        <div class="tbtn" onclick="game.showTitle()">返回</div>
+      </div>
+    </div></div>`;
+  },
+  startNew(skip18){
+    this.resetState();
+    this.flags.skip18 = !!skip18;
+    this.overlay.innerHTML='';
+    document.getElementById('dlg').style.display='';
+    document.getElementById('topbar').style.display='';
+    document.getElementById('spr').style.display='';
+    this.goto('p1');
+    this.startBgm();
+  },
+  save(manual){
+    if(!this.node) return;
+    LS.setItem('hhz_save', JSON.stringify({node:this.node, aff:this.aff, flags:this.flags}));
+    if(manual) this.toast('已存档 ✓ 世人皆记你此刻风华');
+  },
+  load(){
+    const raw = LS.getItem('hhz_save');
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    this.aff = d.aff; this.flags = d.flags||{}; this.node = null;
+    this.overlay.innerHTML='';
+    document.getElementById('dlg').style.display='';
+    document.getElementById('topbar').style.display='';
+    document.getElementById('spr').style.display='';
+    this.goto(d.node);
+  },
+  toast(msg){
+    const t=document.createElement('div');
+    t.textContent=msg;
+    t.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(40,18,34,.92);color:#ffe2b8;padding:10px 22px;border-radius:20px;border:1px solid #d4a556;z-index:99;font-size:14px;letter-spacing:2px;transition:opacity .5s';
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),600)},1600);
+  },
+  goto(id){
+    const n = STORY[id];
+    if(!n){ console.error('missing node', id); return; }
+    if(n.gate && !this.flags['g_'+id]){ this.gate18({id:id, alt:n.alt}); return; }
+    this.node = id;
+    if(n.bg) this.setBg(n.bg);
+    if(n.ending){ this.playEnding(n.id); return; }
+    // speaker
+    const who = document.getElementById('who');
+    const spr = document.getElementById('spr');
+    const av  = document.getElementById('avatar');
+    if(n.spr && CHARS[n.spr] && CHARS[n.spr].img){
+      if(!spr.src.endsWith(CHARS[n.spr].img)){
+        spr.src = CHARS[n.spr].img;
+        spr.classList.remove('enter'); void spr.offsetWidth; spr.classList.add('enter');
+      }
+      spr.style.display='';
+    } else { spr.style.display='none'; }
+    who.textContent = (CHARS[n.who]?CHARS[n.who].name:n.who)||'';
+    av.style.display = (CHARS[n.who]&&CHARS[n.who].img)?'':'none';
+    if(CHARS[n.who]&&CHARS[n.who].img) av.src = CHARS[n.who].img;
+    this.setText(n.text||'');
+    if(n.effect==='flash') this.doFlash();
+    if(n.flags) n.flags.forEach(f=>this.flags[f]=true);
+    if(n.aff) for(const k in n.aff) this.aff[k]=(this.aff[k]||0)+n.aff[k];
+    this.renderAff();
+    this.pending = n; this.choiceMode=false;
+    if(n.choices){ this.showChoices(n.choices); }
+    else { document.getElementById('choices').style.display='none'; }
+    this.save(false);
+  },
+  setText(t){
+    clearInterval(this.typeTimer);
+    this.fullText = t;
+    const el = document.getElementById('txt');
+    el.innerHTML = t.replace(/\n/g,'<br>');
+    this.typing=false;
+    document.getElementById('hint').style.display='';
+  },
+  doFlash(){
+    const f=document.getElementById('flash');
+    f.style.opacity=.9; setTimeout(()=>f.style.opacity=0,120);
+  },
+  setBg(bg){
+    const el=document.getElementById('bg');
+    if(el.dataset.cur===bg) return;
+    el.dataset.cur=bg;
+    el.style.opacity=0;
+    const img=new Image();
+    img.onload=()=>{ el.style.backgroundImage=`url('${bg}')`; el.style.opacity=1; };
+    img.src=bg;
+  },
+  advance(){
+    if(!this.node||this.choiceMode) return;
+    if(this.typing){ clearInterval(this.typeTimer); this.typing=false;
+      document.getElementById('txt').innerHTML=this.fullText.replace(/\n/g,'<br>'); return; }
+    const n=this.pending;
+    if(n&&n.next) this.goto(n.next);
+  },
+  showChoices(list){
+    this.choiceMode=true;
+    const c=document.getElementById('choices');
+    c.innerHTML='';
+    list.filter(ch=>!ch.when||ch.when()).forEach(ch=>{
+      const d=document.createElement('div');
+      d.className='choice';
+      d.innerHTML=ch.t+(ch.sub?`<span class="sub">${ch.sub}</span>`:'');
+      d.onclick=()=>{ c.style.display='none'; this.choiceMode=false;
+        if(ch.aff) for(const k in ch.aff) this.aff[k]=(this.aff[k]||0)+ch.aff[k];
+        if(ch.flag) this.flags[ch.flag]=true;
+        if(ch.set) Object.assign(this.flags, ch.set);
+        this.renderAff();
+        if(ch.next){ const nx = typeof ch.next==='function'? ch.next(): ch.next; if(nx) this.goto(nx); }
+      };
+      c.appendChild(d);
+    });
+    c.style.display='flex';
+  },
+  toggleUI(){
+    document.body.classList.toggle('ui-hidden');
+    document.getElementById('dlg').classList.toggle('hidden-ui');
+    document.getElementById('topbar').classList.toggle('hidden-ui');
+    document.getElementById('bgDim').style.opacity = document.body.classList.contains('ui-hidden')?0:1;
+  },
+  toggleAff(){
+    this.affVisible=!this.affVisible;
+    this.renderAff();
+  },
+  renderAff(){
+    const bar=document.getElementById('affBar');
+    if(!this.affVisible){ bar.innerHTML=''; return; }
+    bar.innerHTML = AFF_KEYS.map(k=>{
+      const v=this.aff[k]||0;
+      const h='❤'.repeat(Math.min(5,Math.max(0,Math.round(v/6))));
+      return `<span class="affchip">${CHARS[k].name} ${h||'♡'}</span>`;
+    }).join('');
+  },
+  /* ---------- R18 门 ---------- */
+  gate18(node){
+    if(this.flags.skip18){ this.flags['g_'+node.id]=true; this.goto(node.alt); return; }
+    this.overlay.innerHTML=`
+    <div class="modal"><div class="card">
+      <h3>🔞 成人章节</h3><div class="rose-line"></div>
+      <p>即将进入<b>合欢宗秘辛</b>——本章含成人向亲密情节，采用含蓄唯美的意象化描写。</p>
+      <p>确认已年满十八岁？</p>
+      <div class="btnRow">
+        <div class="tbtn" onclick="game.flags['g_${node.id}']=true;game.closeModal();game.goto('${node.id}')">已成年，进入</div>
+        <div class="tbtn" onclick="game.closeModal();game.goto('${node.alt}')">跳过本章</div>
+      </div>
+    </div></div>`;
+  },
+  closeModal(){ this.overlay.innerHTML=''; },
+  /* ---------- 结局 ---------- */
+  playEnding(id){
+    const meta = ENDING_TEXT[id];
+    if(!meta){ console.error('missing ending text', id); return; }
+    document.getElementById('dlg').style.display='none';
+    document.getElementById('choices').style.display='none';
+    document.getElementById('topbar').style.display='none';
+    this.unlocked[id]=true;
+    LS.setItem('hhz_ends', JSON.stringify(this.unlocked));
+    const paras = [...meta.text];
+    const card = ENDINGS.find(e=>e.id===id) || {tag:'结局', name:id};
+    const show = (i)=>{
+      if(i>=paras.length){ this.showEndCard(meta, card); return; }
+      this.overlay.innerHTML=`
+        <div class="modal" style="background:rgba(8,3,8,.88)"><div class="card" style="text-align:center">
+          <div style="color:#c98aa2;letter-spacing:4px;font-size:13px">${card.tag} · ${card.name}</div>
+          <div class="rose-line"></div>
+          <p style="text-align:left;font-size:16.5px;line-height:2.1">${paras[i].replace(/\n/g,'<br>')}</p>
+          <div class="btnRow"><div class="tbtn" onclick="void(0)" id="endNext">继续 ▼</div></div>
+        </div></div>`;
+      document.getElementById('endNext').onclick=()=>show(i+1);
+    };
+    show(0);
+  },
+  showEndCard(meta, card){
+    this.overlay.innerHTML=`
+      <div id="endCard">
+        <div class="small">—— 结 局 达 成 ——</div>
+        <div class="big">${card.name}</div>
+        <div class="small">${card.tag} · 已收录图鉴（${Object.keys(this.unlocked).length}/14）</div>
+        <div class="replay">${meta.after||''}</div>
+        <div class="tbtn" onclick="location.reload()">回 到 标 题</div>
+      </div>`;
+  },
+  showEnds(){
+    const cells = ENDINGS.map(e=>{
+      const on=this.unlocked[e.id];
+      return `<div class="endCell ${on?'on':'off'}" ${on?`onclick="game.readEnd('${e.id}')"`:''}>
+        <span class="tag">${on?e.tag:'？？？'}</span>${on?e.name:'未解锁'}</div>`;
+    }).join('');
+    this.overlay.innerHTML=`
+    <div class="modal"><div class="card">
+      <h3>结局图鉴（${Object.keys(this.unlocked).length}/14）</h3><div class="rose-line"></div>
+      <p style="font-size:13px;color:#d9b98c;text-align:center">5 长篇 True End ＋ 9 短篇结局 · 点击已解锁结局可重温</p>
+      <div id="endGrid">${cells}</div>
+      <div class="btnRow"><div class="tbtn" onclick="game.showTitle()">返回</div></div>
+    </div></div>`;
+  },
+  readEnd(id){
+    const meta = ENDING_TEXT[id];
+    if(!meta) return;
+    const card = ENDINGS.find(e=>e.id===id);
+    this.overlay.innerHTML=`
+      <div class="modal"><div class="card" style="text-align:center">
+        <div style="color:#c98aa2;letter-spacing:4px;font-size:13px">${card.tag}</div>
+        <h3>${card.name}</h3><div class="rose-line"></div>
+        ${meta.text.map(p=>`<p style="text-align:left">${p.replace(/\n/g,'<br>')}</p>`).join('')}
+        <div class="btnRow"><div class="tbtn" onclick="game.showEnds()">返回图鉴</div></div>
+      </div></div>`;
+  }
+};
+window.addEventListener('load', ()=>game.init());
+document.getElementById('app').addEventListener('click', e=>{
+  if(!game.node) return;
+  if(e.target.closest('.choice')||e.target.closest('.card')||e.target.closest('.menuBtn')||e.target.closest('.tbtn')||e.target.closest('.modal')) return;
+  if(e.target.closest('#dlg')){ game.advance(); return; }
+  const choicesOpen = document.getElementById('choices').style.display==='flex';
+  if(!choicesOpen) game.toggleUI();
+});
+</script>
+</body>
+</html>
